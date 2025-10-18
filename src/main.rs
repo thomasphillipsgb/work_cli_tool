@@ -1,12 +1,13 @@
 mod args;
 use clap::Parser;
+use work_cli_tool::{input_retrieval::{ConsoleInputRetrieval, InputRetrieval}, translation_exporting};
 
 use crate::args::Args;
 
 fn main() {
     let args = Args::try_parse();
+    start_interactive_mode();
     if let Err(e) = args {
-        start_interactive_mode();
     } else {
         let _args = args.unwrap();
         // Handle command-line arguments here
@@ -19,10 +20,12 @@ fn start_interactive_mode() {
     println!("2. Import Translations");
     println!("3. App Versioning");
 
-    match get_user_choice() {
+    let input_retrieval = ConsoleInputRetrieval;
+
+    match input_retrieval.get_user_choice(3) {
         1 => {
             println!("Exporting translations...");
-            export_translations();
+            export_translations(&input_retrieval);
         }
         2 => {
             println!("Importing translations...");
@@ -38,23 +41,12 @@ fn start_interactive_mode() {
     }
 }
 
-fn export_translations() {
+fn export_translations(input: &dyn InputRetrieval) {
+    let exporter = translation_exporting::TranslationExporter::new();
 
-    todo!()
-}
+    let resx_path = input.get_freetype_input("Enter the path to the RESX file: ").unwrap();
+    let csv_path = input.get_freetype_input("Enter the path to the CSV file: ").unwrap();
 
-fn get_user_choice() -> i32 {
-    use std::io;
-
-    let mut input = String::new();
-    io::stdin()
-        .read_line(&mut input)
-        .expect("Failed to read line");
-    match input.trim().parse::<i32>() {
-        Ok(num) => num,
-        _ => {
-            println!("Invalid choice, please enter a number between 1 and 3.");
-            get_user_choice()
-        }
-    }
+    exporter.export(&resx_path, &csv_path).unwrap();
+    println!("Export completed successfully!");
 }
