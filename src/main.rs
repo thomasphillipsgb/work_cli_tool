@@ -1,6 +1,10 @@
 mod args;
 use clap::Parser;
-use work_cli_tool::{input_retrieval::{ConsoleInputRetrieval, InputRetrieval}, translation_exporting};
+use work_cli_tool::{
+    input_retrieval::{ConsoleInputRetrieval, InputRetrieval},
+    translation_exporting,
+    translation_importing::TranslationImporter,
+};
 
 use crate::args::Args;
 
@@ -29,7 +33,7 @@ fn start_interactive_mode() {
         }
         2 => {
             println!("Importing translations...");
-            todo!();
+            import_translations(&input_retrieval);
         }
         3 => {
             println!("Showing app version...");
@@ -41,11 +45,28 @@ fn start_interactive_mode() {
     }
 }
 
+fn import_translations(input_retrieval: &ConsoleInputRetrieval) {
+    let importer = TranslationImporter::new();
+    let csv_path = input_retrieval
+        .get_freetype_input("Enter the path to the CSV file: ")
+        .unwrap();
+    let resx_path = input_retrieval
+        .get_freetype_input("Enter the path to the RESX file: ")
+        .unwrap();
+
+    importer.import(&csv_path, &resx_path).unwrap();
+    println!("Import completed successfully!");
+}
+
 fn export_translations(input: &dyn InputRetrieval) {
     let exporter = translation_exporting::TranslationExporter::new();
 
-    let resx_path = input.get_freetype_input("Enter the path to the RESX file: ").unwrap();
-    let csv_path = input.get_freetype_input("Enter the path to the CSV file: ").unwrap();
+    let resx_path = input
+        .get_freetype_input("Enter the path to the RESX file: ")
+        .unwrap();
+    let csv_path = input
+        .get_freetype_input("Enter the path to the CSV file: ")
+        .unwrap();
 
     exporter.export(&resx_path, &csv_path).unwrap();
     println!("Export completed successfully!");
