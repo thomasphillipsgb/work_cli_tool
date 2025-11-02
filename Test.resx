@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+    <data name="Hello">
+        <value>Hello World</value>
+        <comment>This is a greeting</comment>
+    </data>
+    <data name="Goodbye">
+        <value>Goodbye World</value>
+    </data>
+</root>
